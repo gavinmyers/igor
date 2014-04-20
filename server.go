@@ -1,9 +1,12 @@
 package main
 
-import ("./moo")
+import (
+	"./moo"
+)
 
 var server moo.MooServer
+
 func main() {
-  server = &moo.TelnetMooServer {}
-  server.Init()
+	server = &moo.TelnetMooServer{}
+	server.Init()
 }

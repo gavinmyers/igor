@@ -12,14 +12,12 @@ var DirSouthWest = 1
 var DirSouthEast = 3
 
 type Tile struct {
-  Z int
-  X int
-  Y int
+	Z int
+	X int
+	Y int
 }
-
 
 type Map struct {
-  Z int
-  Tiles [][]*Tile
+	Z     int
+	Tiles [][]*Tile
 }
-

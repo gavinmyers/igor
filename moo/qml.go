@@ -7,8 +7,8 @@ import (
 var root qml.Object
 
 type QmlGUI struct {
-  width int
-  height int
+	width  int
+	height int
 }
 type Player struct {
 	qml.Object
@@ -19,6 +19,7 @@ type Game struct {
 type Floor struct {
 	qml.Object
 }
+
 func (r *Player) HandleClick(xPos, yPos int) {
 	r.Set("x", r.Int("x")+40)
 	r.Set("y", r.Int("y")+40)
@@ -31,16 +32,16 @@ func (r *Player) Update() {
 func (r *Game) Update() {
 }
 func (r *Game) Init() {
-  t := root.Object("floor_0_1")
-  for x := -24; x < 1260; x=x+16 {
-    for y := -24; y < 960; y=y+16 {
-      c := t.Create(nil)
-      c.Set("x",x)
-      c.Set("y",y)
-      c.Set("enabled", true)
-      c.Set("parent",root)
-    }
-  }
+	t := root.Object("floor_0_1")
+	for x := -24; x < 1260; x = x + 16 {
+		for y := -24; y < 960; y = y + 16 {
+			c := t.Create(nil)
+			c.Set("x", x)
+			c.Set("y", y)
+			c.Set("enabled", true)
+			c.Set("parent", root)
+		}
+	}
 }
 func (r *Player) Paint(p *qml.Painter) {
 }
@@ -50,7 +51,6 @@ func (r *Game) Paint(p *qml.Painter) {
 
 func (r *Floor) Paint(p *qml.Painter) {
 }
-
 
 func (c *QmlGUI) run() error {
 	qml.Init(nil)
@@ -67,7 +67,7 @@ func (c *QmlGUI) run() error {
 	}
 
 	win := component.CreateWindow(nil)
-  root = win.Root()
+	root = win.Root()
 	win.Show()
 	win.Wait()
 
@@ -76,18 +76,16 @@ func (c *QmlGUI) run() error {
 }
 
 func (c *QmlGUI) Main() {
-  c.run()
+	c.run()
 }
 
-
 func (c *QmlGUI) Width() int {
-  return c.width
+	return c.width
 }
 
 func (c *QmlGUI) Height() int {
-  return c.height
+	return c.height
 }
-
 
 func (c *QmlGUI) Flush() {
 }
@@ -97,6 +95,3 @@ func (c *QmlGUI) Init() {
 
 func (c *QmlGUI) Draw(x, y, fg, bg int, format string, args ...interface{}) {
 }
-
-
-

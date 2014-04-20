@@ -24,6 +24,7 @@ type Game struct {
 type Floor struct {
 	qml.Object
 }
+
 func (r *Player) HandleClick(xPos, yPos int) {
 	r.Set("x", r.Int("x")+40)
 	r.Set("y", r.Int("y")+40)
@@ -36,16 +37,16 @@ func (r *Player) Update() {
 func (r *Game) Update() {
 }
 func (r *Game) Init() {
-  t := Root.Object("floor_0_1")
-  for x := -24; x < 1260; x=x+16 {
-    for y := -24; y < 960; y=y+16 {
-      c := t.Create(nil)
-      c.Set("x",x)
-      c.Set("y",y)
-      c.Set("enabled", true)
-      c.Set("parent",Root)
-    }
-  }
+	t := Root.Object("floor_0_1")
+	for x := -24; x < 1260; x = x + 16 {
+		for y := -24; y < 960; y = y + 16 {
+			c := t.Create(nil)
+			c.Set("x", x)
+			c.Set("y", y)
+			c.Set("enabled", true)
+			c.Set("parent", Root)
+		}
+	}
 }
 func (r *Player) Paint(p *qml.Painter) {
 }
@@ -72,7 +73,7 @@ func run() error {
 	}
 
 	win := component.CreateWindow(nil)
-  Root = win.Root()
+	Root = win.Root()
 	win.Show()
 	win.Wait()
 
