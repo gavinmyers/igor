@@ -20,6 +20,10 @@ func main() {
 	client.Init()
 	go client.Receive(act)
 	go gui.Receive(act)
-	client.Send([]byte("bleagh"))
+	client.Send([]byte("LOOK"))
+	client.Send([]byte("NORTH"))
+	client.Send([]byte("NORTH"))
+	client.Send([]byte("NORTH"))
+	client.Send([]byte("SOUTH"))
 	gui.Init()
 }

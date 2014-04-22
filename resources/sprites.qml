@@ -9,11 +9,11 @@ Rectangle {
       x: 0
       y: 0
       Timer {
-         interval: 500; running: true; repeat: true
+         interval: 1500; running: true; repeat: true
          onTriggered: game.update() 
       }
       Timer {
-         interval: 500; running: true; repeat: false 
+         interval: 1500; running: true; repeat: false 
          onTriggered: game.init() 
       }
 
