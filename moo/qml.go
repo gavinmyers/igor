@@ -1,8 +1,8 @@
 package moo
 
 import (
-	"gopkg.in/qml.v0"
 	"fmt"
+	"gopkg.in/qml.v0"
 )
 
 var root qml.Object
@@ -95,7 +95,6 @@ func (c *QmlGUI) Draw(x, y, fg, bg int, format string, args ...interface{}) {
 }
 
 func (c *QmlGUI) Receive(rec <-chan *Action) {
-  act := *<-rec
-  fmt.Printf("\n%v <-]\n ", act.Name)
+	act := *<-rec
+	fmt.Printf("\n%v <-]\n ", act.Name)
 }
-

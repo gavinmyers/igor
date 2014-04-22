@@ -26,7 +26,6 @@ type MooClient interface {
 	Init()
 }
 
-
 func (c *TelnetMooClient) Read(con net.Conn) string {
 	var buf [4048]byte
 	_, err := con.Read(buf[0:4048])
@@ -79,10 +78,10 @@ func (c *TelnetMooClient) Receive(out chan<- *Action) {
 			panic(err)
 		}
 		var rec Action
-    //TODO: Convert buf from byte to string back to byte... hrm...
+		//TODO: Convert buf from byte to string back to byte... hrm...
 		json.Unmarshal([]byte(strings.Trim(string(buf), "\x00")), &rec)
-    fmt.Printf("\n%v ->]\n ", rec.Target)
-    out <- &rec
+		fmt.Printf("\n%v ->]\n ", rec.Target)
+		out <- &rec
 
 	}
 }

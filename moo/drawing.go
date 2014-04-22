@@ -6,5 +6,5 @@ type GUI interface {
 	Draw(int, int, int, int, string, ...interface{})
 	Flush()
 	Init()
-  Receive(<-chan *Action)
+	Receive(<-chan *Action)
 }
