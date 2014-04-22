@@ -5,6 +5,7 @@ import (
 	"container/list"
 	"encoding/json"
 	"net"
+	"fmt"
 	"strings"
 )
 
@@ -68,14 +69,17 @@ func (c *TelnetMooServer) handlingINOUT(IN <-chan string, lst *list.List) {
 }
 
 func (c *TelnetMooServer) clientreceiver(client *ActiveClient) {
+  fmt.Printf("Client Receiver Running")
 	buf := make([]byte, 2048)
 	for client.Read(buf) {
+    fmt.Printf(string(buf))
 		if bytes.Equal(buf, []byte("quit")) {
 			client.Close()
 			break
 		}
 		r := &Action{Name: client.Name, Target: strings.TrimRight(string(buf), "\x00")}
 		send, _ := json.Marshal(r)
+    fmt.Printf(string(send))
 		client.OUT <- string(send)
 	}
 	r := &Action{Name: client.Name, Target: "LEFT"}
@@ -105,6 +109,7 @@ func (c *TelnetMooServer) clientHandling(con net.Conn, ch chan string, lst *list
 	lst.PushBack(*newclient)
 	r := &Action{Name: name, Target: "JOINED"}
 	send, _ := json.Marshal(r)
+  fmt.Printf(string(send))
 	ch <- string(send)
 }
 

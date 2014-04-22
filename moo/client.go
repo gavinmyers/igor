@@ -40,7 +40,6 @@ func (c *TelnetMooClient) Read(con net.Conn) string {
 }
 
 func (c *TelnetMooClient) Send(msg []byte) {
-	fmt.Println(string(msg))
 	c.connection.Write(msg)
 	/*
 	   reader := bufio.NewReader(os.Stdin);
@@ -82,6 +81,7 @@ func (c *TelnetMooClient) Receive(out chan<- *Action) {
 		var rec Action
     //TODO: Convert buf from byte to string back to byte... hrm...
 		json.Unmarshal([]byte(strings.Trim(string(buf), "\x00")), &rec)
+    fmt.Printf("\n%v ->]\n ", rec.Target)
     out <- &rec
 
 	}
@@ -93,6 +93,4 @@ func (c *TelnetMooClient) Init() {
 	cn, _ := net.Dial("tcp", destination)
 	c.connection = cn
 	//  defer cn.Close();
-  go c.Receive(nil)
-	go c.Send([]byte("LOOK"))
 }

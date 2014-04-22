@@ -17,8 +17,9 @@ func main() {
 		gui = &moo.TermboxGUI{}
 	}
   act := make(chan *moo.Action)
-	gui.Init()
-  go gui.Receive(act)
 	client.Init()
   go client.Receive(act)
+  go gui.Receive(act)
+  client.Send([]byte("bleagh"))
+	gui.Init()
 }

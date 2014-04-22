@@ -56,7 +56,7 @@ func (c TermboxGUI) Draw(x, y, fg, bg int, format string, args ...interface{}) {
 	c.print_tb(x, y, c.color[fg], c.color[bg], s)
 }
 
-func (c *TermboxGUI) Receive(<-chan *Action) {
+func (c *TermboxGUI) Receive(rec <-chan *Action) {
 }
 
 func (c *TermboxGUI) print_tb(x, y int, fg, bg termbox.Attribute, msg string) {
