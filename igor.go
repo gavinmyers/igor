@@ -11,11 +11,14 @@ var client moo.MooClient
 func main() {
 	useQml := flag.Bool("gui", true, "use the graphical interface")
 	client = &moo.TelnetMooClient{}
-	client.Init()
 	if *useQml == true {
 		gui = &moo.QmlGUI{}
 	} else {
 		gui = &moo.TermboxGUI{}
 	}
-	gui.Main()
+  act := make(chan *moo.Action)
+	gui.Init()
+  go gui.Receive(act)
+	client.Init()
+  go client.Receive(act)
 }

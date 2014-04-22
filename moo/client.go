@@ -18,12 +18,14 @@ type TelnetMooClient struct {
 	server     string
 	port       string
 }
+
 type MooClient interface {
 	Read(con net.Conn) string
 	Send(msg []byte)
-	Receive()
+	Receive(chan<- *Action)
 	Init()
 }
+
 
 func (c *TelnetMooClient) Read(con net.Conn) string {
 	var buf [4048]byte
@@ -38,8 +40,8 @@ func (c *TelnetMooClient) Read(con net.Conn) string {
 }
 
 func (c *TelnetMooClient) Send(msg []byte) {
-	fmt.Println(msg)
-	c.connection.Write(msg) // send output to server
+	fmt.Println(string(msg))
+	c.connection.Write(msg)
 	/*
 	   reader := bufio.NewReader(os.Stdin);
 	   for {
@@ -70,19 +72,18 @@ func (c *TelnetMooClient) Send(msg []byte) {
 	*/
 }
 
-func (c *TelnetMooClient) Receive() {
-	for c.running {
+func (c *TelnetMooClient) Receive(out chan<- *Action) {
+	for {
 		buf := make([]byte, 2048)
 		_, err := c.connection.Read(buf)
 		if err != nil {
 			panic(err)
 		}
 		var rec Action
+    //TODO: Convert buf from byte to string back to byte... hrm...
 		json.Unmarshal([]byte(strings.Trim(string(buf), "\x00")), &rec)
-		//fmt.Printf(rec.Name)
-		fmt.Printf("(%s)\n", string(buf))
-		fmt.Printf("\n[%v]", rec.Name)
-		fmt.Printf(" %v\n---------\n", rec.Target)
+    out <- &rec
+
 	}
 }
 
@@ -92,7 +93,6 @@ func (c *TelnetMooClient) Init() {
 	cn, _ := net.Dial("tcp", destination)
 	c.connection = cn
 	//  defer cn.Close();
-	go c.Receive()
-	go c.Send([]byte("Hey There"))
-	fmt.Printf(" Loading up telnet")
+  go c.Receive(nil)
+	go c.Send([]byte("LOOK"))
 }

@@ -2,6 +2,7 @@ package moo
 
 import (
 	"gopkg.in/qml.v0"
+	"fmt"
 )
 
 var root qml.Object
@@ -75,7 +76,7 @@ func (c *QmlGUI) run() error {
 
 }
 
-func (c *QmlGUI) Main() {
+func (c *QmlGUI) Init() {
 	c.run()
 }
 
@@ -90,8 +91,11 @@ func (c *QmlGUI) Height() int {
 func (c *QmlGUI) Flush() {
 }
 
-func (c *QmlGUI) Init() {
-}
-
 func (c *QmlGUI) Draw(x, y, fg, bg int, format string, args ...interface{}) {
 }
+
+func (c *QmlGUI) Receive(rec <-chan *Action) {
+  fmt.Printf("hi there")
+  fmt.Printf("[%v] ", *rec.Target)
+}
+
