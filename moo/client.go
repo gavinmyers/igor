@@ -39,6 +39,7 @@ func (c *TelnetMooClient) Read(con net.Conn) string {
 }
 
 func (c *TelnetMooClient) Send(msg []byte) {
+ fmt.Printf("\nSending: %s\n", msg)
 	c.connection.Write(msg)
 	/*
 	   reader := bufio.NewReader(os.Stdin);
