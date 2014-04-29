@@ -95,6 +95,7 @@ func (c *QmlGUI) Draw(x, y, fg, bg int, format string, args ...interface{}) {
 }
 
 func (c *QmlGUI) Receive(rec <-chan *Action) {
-	var act Action = *<-rec
+//	var act Action = *<-rec
+  act := <-rec
 	fmt.Printf("\n%v <-]\n ", act.Name)
 }

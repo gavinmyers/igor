@@ -1,5 +1,36 @@
 package moo
 
+/*
+what should the server do
+
+#1 - Receive messages from client
+server.Receive(Message)
+#2 - Broadcast messages to all clients... really this should be a subset depending on need
+server.Broadcast(Message, []clients)
+#3 - Connect a new client
+server.Connect(client)
+#4 - Disconnect a client
+server.Disconnect(client)
+
+at some point in time the server will actually need to _do_ _something_ ... which means take client message X and apply it to logic engine Y... how in the hell do you want to do that.
+
+Moo world
+
+X <interaction> <against> Y
+
+player.doAttack(lawnmower)
+"you can't attack a lawnmower"
+
+client.send("Player:Attack:Lawnmower")
+server.receive(above)
+
+Engine.get(Player).do(Player.Attack).to(Lawnmower)
+
+
+
+*/
+
+
 import (
 	"encoding/json"
 	"fmt"
@@ -21,7 +52,7 @@ type TelnetMooClient struct {
 
 type MooClient interface {
 	Read(con net.Conn) string
-	Send(msg []byte)
+	Send(msg *Action)
 	Receive(chan<- *Action)
 	Init()
 }
@@ -38,9 +69,10 @@ func (c *TelnetMooClient) Read(con net.Conn) string {
 	return string(str)
 }
 
-func (c *TelnetMooClient) Send(msg []byte) {
- fmt.Printf("\nSending: %s\n", msg)
-	c.connection.Write(msg)
+func (c *TelnetMooClient) Send(act *Action) {
+  send, _ := json.Marshal(act)
+  fmt.Printf("\nSending: %s\n", send)
+	c.connection.Write(send)
 	/*
 	   reader := bufio.NewReader(os.Stdin);
 	   for {

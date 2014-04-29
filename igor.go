@@ -20,10 +20,15 @@ func main() {
 	client.Init()
 	go client.Receive(act)
 	go gui.Receive(act)
-	client.Send([]byte("LOOK"))
-	client.Send([]byte("NORTH"))
-	client.Send([]byte("NORTH"))
-	client.Send([]byte("NORTH"))
-	client.Send([]byte("SOUTH"))
+  go send()
 	gui.Init()
+}
+
+func send() {
+  r1 := &moo.Action{Name: "Joe", Target: "LOOK"}
+	client.Send(r1)
+  r2 := &moo.Action{Name: "Joe", Target: "SIT"}
+	client.Send(r2)
+  r3 := &moo.Action{Name: "Joe", Target: "STAND"}
+	client.Send(r3)
 }
