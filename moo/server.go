@@ -37,7 +37,6 @@ func (c *ActiveClient) Read(buf []byte) bool {
 func (c *ActiveClient) receive() {
 	buf := make([]byte, 2048)
 	for c.Read(buf) {
-    fmt.Printf("\nv\n",string(buf))
 		if bytes.Equal(buf, []byte("quit")) {
 			c.Close()
 			break
@@ -89,18 +88,33 @@ func (c *TelnetMooServer) receive(IN <-chan string, lst *list.List) {
 		}
 	}
 }
-
-func (c *TelnetMooServer) broadcast(con net.Conn, ch chan string, lst *list.List) {
+/*
 	buf := make([]byte, 1024)
-	bytenum, _ := con.Read(buf)
-	name := string(buf[0:bytenum])
-	newclient := &ActiveClient{name, make(chan string), ch, con, make(chan bool), lst}
+	con.Read(buf)
+  var rin Action
+  json.Unmarshal([]byte(strings.Trim(string(buf), "\x00")), &rin)
+	newclient := &ActiveClient{rin.Name, make(chan string), ch, con, make(chan bool), lst}
 	go newclient.broadcast()
 	go newclient.receive()
 	lst.PushBack(*newclient)
-	r := &Action{Name: name, Target: "JOINED"}
+	rout := &Action{Name: rin.Name, Target: "JOINED"}
+	send, _ := json.Marshal(rout)
+  fmt.Printf("\nBROADCAST: %v\n",string(send))
+	ch <- string(send)
+*/
+func (c *TelnetMooServer) broadcast(con net.Conn, ch chan string, lst *list.List) {
+	buf := make([]byte, 1024)
+	bytenum, _ := con.Read(buf)
+  var rin Action
+  strin := string(buf[0:bytenum])
+  json.Unmarshal([]byte(strin), &rin)
+	newclient := &ActiveClient{rin.Name, make(chan string), ch, con, make(chan bool), lst}
+	go newclient.broadcast()
+	go newclient.receive()
+	lst.PushBack(*newclient)
+	r := &Action{Name: rin.Name, Target: "JOINED"}
 	send, _ := json.Marshal(r)
-	fmt.Printf("\n%v\n",string(send))
+  fmt.Printf("\nBROADCAST: %v\n",string(strin))
 	ch <- string(send)
 }
 
@@ -109,7 +123,7 @@ func (c *TelnetMooServer) Init() {
 	in := make(chan string)
 	go c.receive(in, clients)
 	netlisten, _ := net.Listen("tcp", "127.0.0.1:9988")
-	defer netlisten.Close()
+	//defer netlisten.Close()
 	for {
 		conn, _ := netlisten.Accept()
 		go c.broadcast(conn, in, clients) //&conn..

@@ -72,7 +72,10 @@ func (c *TelnetMooClient) Read(con net.Conn) string {
 func (c *TelnetMooClient) Send(act *Action) {
   send, _ := json.Marshal(act)
   fmt.Printf("\nSending: %s\n", send)
-	c.connection.Write(send)
+  _, err := c.connection.Write(send)
+  if err != nil {
+    panic(err)
+  }
 	/*
 	   reader := bufio.NewReader(os.Stdin);
 	   for {
@@ -121,8 +124,7 @@ func (c *TelnetMooClient) Receive(out chan<- *Action) {
 
 func (c *TelnetMooClient) Init() {
 	c.running = true
-	destination := fmt.Sprintf("%s:%s", "127.0.0.1", "9988")
-	cn, _ := net.Dial("tcp", destination)
+  cn, _ := net.Dial("tcp", "127.0.0.1:9988")
 	c.connection = cn
 	//  defer cn.Close();
 }

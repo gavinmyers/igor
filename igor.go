@@ -3,6 +3,8 @@ package main
 import (
 	"./moo"
 	"flag"
+  "time"
+  "fmt"
 )
 
 var gui moo.GUI
@@ -22,13 +24,15 @@ func main() {
 	go gui.Receive(act)
   go send()
 	gui.Init()
+  time.Sleep(10 * time.Millisecond)
 }
 
 func send() {
+  fmt.Printf("\nGeneric Send\n")
   r1 := &moo.Action{Name: "Joe", Target: "LOOK"}
-	client.Send(r1)
+	go client.Send(r1)
   r2 := &moo.Action{Name: "Joe", Target: "SIT"}
-	client.Send(r2)
+	go client.Send(r2)
   r3 := &moo.Action{Name: "Joe", Target: "STAND"}
-	client.Send(r3)
+	go client.Send(r3)
 }
