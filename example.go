@@ -4,6 +4,7 @@ import (
   "fmt"
   "net"
   "strings"
+  "time"
   "io"
 	"encoding/json"
 )
@@ -12,14 +13,14 @@ var clients map[string]*Client
 var listener net.Listener
 
 type Client struct {
-  Session string
+  Data map[string]string
   Conn net.Conn
 }
 
 type Message struct {
-  Session string
+  Token string
   Action string
-  Commands map[string]string
+  Data map[string]string
 }
 
 func Read(con net.Conn) {
@@ -36,25 +37,40 @@ func Read(con net.Conn) {
       if(len(msg) > 0) {
         var message Message
         json.Unmarshal([]byte(msg), &message)
-        fmt.Printf("\n Svr Received %d > %v %v %v", bytenum, message.Session, message.Action, message.Commands)
+        //fmt.Printf("\n Svr Received %d > %v %v %v", bytenum, message.Token, message.Action, message.Data)
         switch message.Action {
-          case "CONNECT":
-            fmt.Printf("\n WELCOME TO IGOR [%v] ", message.Session)
-            client := &Client{Session:message.Session,Conn:con}
-            clients[message.Session] = client
-          case "DISCONNECT":
-            fmt.Printf("\n GOODBYE [%v] ", message.Session)
-            clients[message.Session].Conn.Close()
-            delete(clients, message.Session)
+          case "connect":
+            fmt.Printf("\n SYSTEM ONLINE [%v] ", message.Token)
+            client := &Client{Conn:con,Data:map[string]string{"session":message.Token}}
+            clients[message.Token] = client
+          case "disconnect":
+            fmt.Printf("\n GOODBYE [%v] ", message.Token)
+            clients[message.Token].Conn.Close()
+            delete(clients, message.Token)
+          case "writeto":
+            go WriteTo(message.Token, message.Data["target"],msg)
+          case "who":
+            go Who(message.Token)
           default:
-            go Write(msg)
+            go WriteToAll(msg)
         }
       }
     }
   }
 }
+func Who(from string) {
+  client := clients[from]
+  client.Conn.Write([]byte("LIST" + "\r\n"))
+}
 
-func Write(msg string) {
+func WriteTo(from string, to string, msg string) {
+  client := clients[to]
+  if(client != nil) {
+    client.Conn.Write([]byte(msg + "\r\n"))
+  }
+}
+
+func WriteToAll(msg string) {
   for _, client := range clients {
     client.Conn.Write([]byte(msg + "\r\n"))
   }
@@ -84,8 +100,8 @@ func clientListener(con net.Conn,who string) {
       if(len(msg) > 0) {
         var message Message
         json.Unmarshal([]byte(msg), &message)
-        if(message.Session != who) {
-          fmt.Printf("\n %v from %v to %v '%v'",message.Action, message.Session,who, message.Commands["5"])
+        if(message.Token != who) {
+          fmt.Printf("\n %v from %v to %v '%v'",message.Action, message.Token,who, message.Data["message"])
         }
       }
     }
@@ -93,16 +109,18 @@ func clientListener(con net.Conn,who string) {
 }
 
 func clientBroadcast(con net.Conn, who string, msg string) {
-  send, _ := json.Marshal(&Message{Session:who, Action:"SPEAK", Commands:map[string]string{"5":"five", "55":"z", "555":"b"}})
+  message := &Message{Token:who, Action:"writeto",
+                      Data:map[string]string{"target":"Rbt1", "message":msg}}
+  send, _ := json.Marshal(message)
   con.Write([]byte(string(send)+"\r\n"))
 }
 
 func clientJoin(con net.Conn, who string) {
-  send, _ := json.Marshal(&Message{Session:who, Action:"CONNECT"})
+  send, _ := json.Marshal(&Message{Token:who, Action:"connect"})
   con.Write([]byte(string(send)+"\r\n"))
 }
 func clientDisconnect(con net.Conn, who string) {
-  send, _ := json.Marshal(&Message{Session:who, Action:"DISCONNECT"})
+  send, _ := json.Marshal(&Message{Token:who, Action:"disconnect"})
   con.Write([]byte(string(send)+"\r\n"))
 }
 
@@ -110,17 +128,21 @@ func client(who string) {
   con, _ := net.Dial("tcp", "127.0.0.1:9988")
   go clientListener(con,who)
   clientJoin(con,who)
-  clientBroadcast(con,who,"Hello")
-  clientBroadcast(con,who,"How are you today?")
+  time.Sleep(100 * time.Millisecond)
+  clientBroadcast(con,who,"Service test1")
+  time.Sleep(50 * time.Millisecond)
+  clientBroadcast(con,who,"Service test2")
+  time.Sleep(50 * time.Millisecond)
   clientBroadcast(con,who,"Goodbye")
-  //clientDisconnect(con,who)
+  time.Sleep(100 * time.Millisecond)
+  clientDisconnect(con,who)
 }
 
 func main() {
   go Listen()
-  go client("Joe")
-  go client("Frank")
-  go client("Lisa")
+  go client("Rbt1")
+  go client("Rbt2")
+  go client("Rbt3")
   var i string
   fmt.Scanf("%v", &i)
 }
