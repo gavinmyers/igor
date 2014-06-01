@@ -7,7 +7,20 @@ import (
   "time"
   "io"
 	"encoding/json"
+
+  "math/rand"
+  //"math/big"
 )
+
+func randString(n int) string {
+    r := rand.New(rand.NewSource(99))
+    var bytes = make([]byte, n)
+    for i := range bytes {
+        bytes[i] = byte(r.Intn(10))
+    }
+    return string(bytes)
+}
+var r string
 
 var clients map[string]*Client
 var listener net.Listener
@@ -33,6 +46,7 @@ func Read(con net.Conn) {
       return
     }
     arr := strings.Split(strin, "\r\n")
+    //fmt.Printf("\n Svr Received %v",strin) 
     for _, msg := range arr {
       if(len(msg) > 0) {
         var message Message
@@ -40,9 +54,11 @@ func Read(con net.Conn) {
         //fmt.Printf("\n Svr Received %d > %v %v %v", bytenum, message.Token, message.Action, message.Data)
         switch message.Action {
           case "connect":
-            fmt.Printf("\n SYSTEM ONLINE [%v] ", message.Token)
             client := &Client{Conn:con,Data:map[string]string{"session":message.Token}}
             clients[message.Token] = client
+            send, _ := json.Marshal(&Message{Token:message.Token, Action:"ack",Data:map[string]string{"rand":randString(30000)}})
+            fmt.Printf("\n SYSTEM ONLINE [%v] ", message.Token)
+            go WriteTo(message.Token,message.Token,string(send) + "/r/n")
           case "disconnect":
             fmt.Printf("\n GOODBYE [%v] ", message.Token)
             clients[message.Token].Conn.Close()
@@ -139,6 +155,7 @@ func client(who string) {
 }
 
 func main() {
+  r = randString(1200000)
   go Listen()
   go client("Rbt1")
   go client("Rbt2")
